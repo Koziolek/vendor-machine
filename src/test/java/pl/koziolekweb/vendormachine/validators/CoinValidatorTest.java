@@ -30,11 +30,4 @@ class CoinValidatorTest {
         Assertions.assertThat(sut.isValid(val, null)).isFalse();
     }
 
-    // SLOW!
-//    static Stream<Integer> incorrectValues(){
-//        return IntStream.rangeClosed(Integer.MIN_VALUE, Integer.MAX_VALUE)
-//                .filter(i -> !CoinValidator.valid.contains(i))
-//                .boxed();
-//    }
-
 }

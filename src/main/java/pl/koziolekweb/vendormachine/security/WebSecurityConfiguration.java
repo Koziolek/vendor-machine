@@ -39,6 +39,7 @@ class WebSecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/console/**").permitAll()
+                .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated().and()
                 .headers().frameOptions().sameOrigin().and() // just for h2 console
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()

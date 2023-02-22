@@ -1,6 +1,7 @@
 package pl.koziolekweb.vendormachine.validators;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -14,4 +15,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = CoinValidator.class)
 @Documented
 public @interface Coin {
+
+    String message() default "Very bad coin";
+
+    Class<?>[] groups() default { };
+
+    Class<? extends Payload>[] payload() default { };
 }
