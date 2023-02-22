@@ -13,6 +13,7 @@ import java.util.UUID;
 @Data
 @Entity
 @AllArgsConstructor
+@Builder
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

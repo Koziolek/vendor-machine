@@ -9,10 +9,11 @@ import net.minidev.json.annotate.JsonIgnore;
 
 @NoArgsConstructor
 @Data
-@Entity
-@Table(name = "users")
 @Builder
 @AllArgsConstructor
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class User {
     @Id
     private String username;

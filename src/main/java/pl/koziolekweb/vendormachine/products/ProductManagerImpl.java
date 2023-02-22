@@ -1,5 +1,6 @@
 package pl.koziolekweb.vendormachine.products;
 
+import io.vavr.control.Either;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.util.Collection;
 class ProductManagerImpl implements ProductManager {
     private final ProductRepository repository;
     private final ProductMappers productMappers;
+
     @Override
     public Product createProduct(CreateProductRequest productRequest, User creator) {
         var product = productMappers.fromCreate(productRequest, creator);
@@ -20,13 +22,16 @@ class ProductManagerImpl implements ProductManager {
     }
 
     @Override
-    public Product updateProduct(UpdateProductRequest productRequest, User updater) {
-        return null;
+    public Either<String, Product> updateProduct(UpdateProductRequest productRequest, User updater) {
+        return repository.findByIdAndSeller(productRequest.id(), updater)
+                .map(Either::<String, Product>right)
+                .orElse(Either.left("Product does not exists"));
     }
 
     @Override
-    public Product deleteProduct(DeleteProductRequest productRequest, User updater) {
-        return null;
+    public void deleteProduct(DeleteProductRequest productRequest, User updater) {
+        repository.findByIdAndSeller(productRequest.id(), updater)
+                .ifPresent(repository::delete);
     }
 
     @Override

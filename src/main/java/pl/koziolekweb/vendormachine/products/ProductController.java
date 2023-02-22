@@ -12,6 +12,9 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor
@@ -32,15 +35,22 @@ class ProductController {
     public ResponseEntity<?> save(@RequestBody CreateProductRequest request, Principal principal) {
         final User currentUser = userRepository.findById(principal.getName()).get();
         final Product product = manager.createProduct(request, currentUser);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.status(CREATED).body(product);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SELLER')")
     @PutMapping
     public ResponseEntity<?> update(@RequestBody UpdateProductRequest request, Principal principal) {
         final User currentUser = userRepository.findById(principal.getName()).get();
-        final Product product = manager.updateProduct(request, currentUser);
-        return ResponseEntity.ok(product);
+        var result = manager.updateProduct(request, currentUser)
+                .bimap(
+                        l -> ResponseEntity.status(NOT_FOUND).build(),
+                        r -> ResponseEntity.status(CREATED).body(r)
+                );
+        if (result.isRight())
+            return result.get();
+
+        return result.getLeft();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SELLER')")
