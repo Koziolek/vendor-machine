@@ -1,5 +1,9 @@
 package pl.koziolekweb.vendormachine.products;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.koziolekweb.vendormachine.persons.User;
 import pl.koziolekweb.vendormachine.persons.UserRepository;
+import pl.koziolekweb.vendormachine.validators.DividedBy;
 
 import java.security.Principal;
 import java.util.Collection;
@@ -14,6 +19,7 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static pl.koziolekweb.vendormachine.utils.ApiHelper.asResponse;
 
 @RestController
 @RequestMapping("/product")
@@ -32,9 +38,9 @@ class ProductController {
 
     @PreAuthorize("hasAnyRole('ROLE_SELLER')")
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody CreateProductRequest request, Principal principal) {
-        final User currentUser = userRepository.findById(principal.getName()).get();
-        final Product product = manager.createProduct(request, currentUser);
+    public ResponseEntity<?> save(@RequestBody @Valid CreateProductRequest request, Principal principal) {
+        var currentUser = userRepository.findById(principal.getName()).get();
+        var product = manager.createProduct(request, currentUser);
         return ResponseEntity.status(CREATED).body(product);
     }
 
@@ -47,10 +53,7 @@ class ProductController {
                         l -> ResponseEntity.status(NOT_FOUND).build(),
                         r -> ResponseEntity.status(CREATED).body(r)
                 );
-        if (result.isRight())
-            return result.get();
-
-        return result.getLeft();
+        return asResponse(result);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SELLER')")
@@ -63,13 +66,13 @@ class ProductController {
 
 }
 
-record CreateProductRequest(long amount, int cost, String name) {
+record CreateProductRequest(@NotNull @Min(0) long amount, @NotNull @Min(0) @DividedBy(5) int cost, @NotNull @NotBlank String name) {
 }
 
-record UpdateProductRequest(UUID id, long amount, int cost, String name) {
+record UpdateProductRequest(@NotNull UUID id, @NotNull @Min(0) long amount, @NotNull @Min(0) @DividedBy(5) int cost, @NotNull @NotBlank String name) {
 }
 
-record DeleteProductRequest(UUID id) {
+record DeleteProductRequest(@NotNull UUID id) {
 }
 
 record ChangeOwnerProductRequest(UUID id, String newSellerId) {

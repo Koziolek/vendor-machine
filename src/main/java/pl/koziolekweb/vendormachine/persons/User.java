@@ -1,11 +1,11 @@
 package pl.koziolekweb.vendormachine.persons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
 
 @NoArgsConstructor
 @Data
@@ -22,4 +22,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
     private long deposit;
+
+    public long deposit(long amount){
+        this.deposit += amount;
+        return this.deposit;
+    }
 }

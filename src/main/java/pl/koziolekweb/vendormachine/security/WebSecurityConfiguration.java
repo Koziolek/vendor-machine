@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
-class WebSecurityConfiguration {
+public class WebSecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,13 +34,24 @@ class WebSecurityConfiguration {
         return authConfig.getAuthenticationManager();
     }
 
+
+    @Bean
+    @Order(1)
+    @SneakyThrows
+    public SecurityFilterChain swaggerChain(HttpSecurity http) {
+        http.csrf().disable()
+                .securityMatcher("/swagger-ui/**", "/v3/**", "/console/**")
+                .authorizeHttpRequests()
+                .requestMatchers("/swagger-ui/**", "/v3/**", "/console/**").permitAll();
+        return http.build();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter, JwtAuthenticationEntryPoint unauthorizedHandler, UserDetailsService userDetailsService) throws Exception {
-        return http.anonymous().and().csrf().disable().cors().and()
+        return http.csrf().disable().cors().and()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/console/**").permitAll()
-                .requestMatchers("/error").permitAll()
+                .requestMatchers("/auth/**", "/error", "/favicon.ico").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/**", "/console/**").permitAll()
                 .anyRequest().authenticated().and()
                 .headers().frameOptions().sameOrigin().and() // just for h2 console
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()

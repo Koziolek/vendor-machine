@@ -12,7 +12,6 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/")
 @RequiredArgsConstructor
 @Log
 class Deposit {
@@ -23,18 +22,22 @@ class Deposit {
     @PreAuthorize("hasAnyRole('ROLE_BUYER')")
     public ResponseEntity<?> deposit(@RequestBody @Valid DepositRequest request, Principal principal) {
         var currentUser = userRepository.findById(principal.getName()).get();
-        return ResponseEntity.ok(currentUser);
+        currentUser.setDeposit(request.sum());
+        return ResponseEntity.ok(userRepository.save(currentUser));
     }
 
-    @GetMapping("/reset")
+    @PostMapping("/reset")
     @PreAuthorize("hasAnyRole('ROLE_BUYER')")
-    public ResponseEntity<?> reset() {
-
-        return ResponseEntity.ok("");
+    public ResponseEntity<?> reset(Principal principal) {
+        var currentUser = userRepository.findById(principal.getName()).get();
+        currentUser.setDeposit(0);
+        return ResponseEntity.ok(userRepository.save(currentUser));
     }
 
 }
 
-
 record DepositRequest(List<@Coin Integer> coins) {
+    long sum() {
+        return coins.stream().reduce(Integer::sum).orElse(0);
+    }
 }

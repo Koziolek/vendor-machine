@@ -15,12 +15,13 @@ import static org.springframework.security.core.userdetails.User.builder;
 @Component
 @RequiredArgsConstructor
 @Log
-class JwtUserDetailsService implements UserDetailsService {
+class JwtUserDetailsService implements UserDetailsService, UserService {
 
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
 
+    @Override
     public User registerUser(User newUser) {
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         return userRepository.save(newUser);

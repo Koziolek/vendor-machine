@@ -1,6 +1,9 @@
 package pl.koziolekweb.vendormachine.security;
 
 import io.vavr.control.Try;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,14 +41,20 @@ public class AuthController {
                 );
     }
 
+    @PostMapping(value = "/user", consumes = {"application/json"})
+    public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterUser user) {
+        register(user, user.role());
+        return ResponseEntity.ok("OK");
+    }
+
     @PostMapping(value = "/register-seller", consumes = {"application/json"})
-    public ResponseEntity<?> registerSeller(@RequestBody RegisterUser user) {
+    public ResponseEntity<?> registerSeller(@RequestBody @Valid RegisterUser user) {
         register(user, Role.SELLER);
         return ResponseEntity.ok("OK");
     }
 
     @PostMapping(value = "/register-buyer", consumes = {"application/json"})
-    public ResponseEntity<?> registerBuyer(@RequestBody RegisterUser user) {
+    public ResponseEntity<?> registerBuyer(@RequestBody @Valid RegisterUser user) {
         register(user, Role.BUYER);
         return ResponseEntity.ok("OK");
     }
@@ -60,8 +69,8 @@ public class AuthController {
     }
 }
 
-record AuthRequest(String username, String password) {
+record AuthRequest(@NotNull String username, @NotNull String password) {
 }
 
-record RegisterUser(String username, String password) {
+record RegisterUser(@NotNull String username, @NotNull String password, @Nullable Role role) {
 }

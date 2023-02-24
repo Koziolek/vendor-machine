@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pl.koziolekweb.vendormachine.persons.User;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +25,8 @@ class ProductManagerImpl implements ProductManager {
     @Override
     public Either<String, Product> updateProduct(UpdateProductRequest productRequest, User updater) {
         return repository.findByIdAndSeller(productRequest.id(), updater)
+                .map(p -> productMappers.fromUpdate(productRequest, p.getSeller()))
+                .map(repository::save)
                 .map(Either::<String, Product>right)
                 .orElse(Either.left("Product does not exists"));
     }

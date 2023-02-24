@@ -7,7 +7,7 @@ import java.util.List;
 
 public class CoinValidator implements ConstraintValidator<Coin, Integer> {
 
-    static final List<Integer> valid = List.of(5, 10, 20, 50, 100);
+    public static final List<Integer> valid = List.of(5, 10, 20, 50, 100);
 
     @Override
     public boolean isValid(Integer value, ConstraintValidatorContext context) {
