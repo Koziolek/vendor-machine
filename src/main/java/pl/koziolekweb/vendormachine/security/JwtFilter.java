@@ -19,38 +19,38 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Log
 class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtUtils jwtUtils;
-    private final UserDetailsService userDetailsService;
+	private final JwtUtils jwtUtils;
+	private final UserDetailsService userDetailsService;
 
-    @Override
-    @SneakyThrows
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        try {
-            String jwt = parseJwt(request);
-            if (jwt != null) {
-                var username = jwtUtils.getUsernameFromToken(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtUtils.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-                else {
-                    logger.error("Invalid token");
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
-        }
-        filterChain.doFilter(request, response);
-    }
+	@Override
+	@SneakyThrows
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+			FilterChain filterChain) {
+		try {
+			String jwt = parseJwt(request);
+			if (jwt != null) {
+				var username = jwtUtils.getUsernameFromToken(jwt);
+				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+				if (jwtUtils.validateToken(jwt, userDetails)) {
+					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+							userDetails,
+							null,
+							userDetails.getAuthorities());
+					authentication.setDetails(
+							new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+				} else {
+					logger.error("Invalid token");
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Cannot set user authentication: {}", e);
+		}
+		filterChain.doFilter(request, response);
+	}
 
-    private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader(SecurityUtils.HEADER_NAME);
-        return SecurityUtils.maybeRemovePrefix(headerAuth, null);
-    }
+	private String parseJwt(HttpServletRequest request) {
+		String headerAuth = request.getHeader(SecurityUtils.HEADER_NAME);
+		return SecurityUtils.maybeRemovePrefix(headerAuth, null);
+	}
 }

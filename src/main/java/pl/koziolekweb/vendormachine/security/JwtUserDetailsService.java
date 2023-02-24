@@ -1,5 +1,7 @@
 package pl.koziolekweb.vendormachine.security;
 
+import static org.springframework.security.core.userdetails.User.builder;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,31 +12,29 @@ import org.springframework.stereotype.Component;
 import pl.koziolekweb.vendormachine.persons.User;
 import pl.koziolekweb.vendormachine.persons.UserRepository;
 
-import static org.springframework.security.core.userdetails.User.builder;
-
 @Component
 @RequiredArgsConstructor
 @Log
 class JwtUserDetailsService implements UserDetailsService, UserService {
 
-    private final PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    @Override
-    public User registerUser(User newUser) {
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        return userRepository.save(newUser);
-    }
+	@Override
+	public User registerUser(User newUser) {
+		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+		return userRepository.save(newUser);
+	}
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findById(username)
-                .map(user -> builder()
-                        .username(user.getUsername())
-                        .password(user.getPassword())
-                        .roles(user.getRole().name())
-                        .build()
-                ).orElseThrow(() -> new UsernameNotFoundException("Cannot find user " + username));
-    }
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return userRepository.findById(username)
+				.map(user -> builder()
+						.username(user.getUsername())
+						.password(user.getPassword())
+						.roles(user.getRole().name())
+						.build())
+				.orElseThrow(() -> new UsernameNotFoundException("Cannot find user " + username));
+	}
 }

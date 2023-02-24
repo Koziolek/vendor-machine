@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    @Override
-    @SneakyThrows
-    public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) {
+	@Override
+	@SneakyThrows
+	public void commence(HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException authException) {
 
-        authException.printStackTrace();
+		authException.printStackTrace();
 
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-    }
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+	}
 }

@@ -5,16 +5,17 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public abstract class AbstractDivideByValidator<T> implements ConstraintValidator<DividedBy, T> {
 
-    protected long value;
-    @Override
-    public void initialize(DividedBy constraintAnnotation) {
-        this.value = constraintAnnotation.value();
-    }
+	protected long value;
 
-    @Override
-    public boolean isValid(T actual, ConstraintValidatorContext context) {
-        return isDivided(actual);
-    }
+	@Override
+	public void initialize(DividedBy constraintAnnotation) {
+		this.value = constraintAnnotation.value();
+	}
 
-    protected abstract boolean isDivided(T actual);
+	@Override
+	public boolean isValid(T actual, ConstraintValidatorContext context) {
+		return isDivided(actual);
+	}
+
+	protected abstract boolean isDivided(T actual);
 }

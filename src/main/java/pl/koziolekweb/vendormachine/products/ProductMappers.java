@@ -7,10 +7,10 @@ import pl.koziolekweb.vendormachine.persons.User;
 @Mapper(componentModel = "spring")
 public interface ProductMappers {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "seller", source = "user")
-    Product fromCreate(CreateProductRequest source, User user);
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "seller", source = "user")
+	Product fromCreate(CreateProductRequest source, User user);
 
-    @Mapping(target = "seller", source = "user")
-    Product fromUpdate(UpdateProductRequest source, User user);
+	@Mapping(target = "seller", source = "user")
+	Product fromUpdate(UpdateProductRequest source, User user);
 }
